@@ -11,7 +11,12 @@
     <button onclick="window.location.href='{{ url_for('create') }}'">Create New Item</button>
     <h2>Your Items: {{ items|length }}</h2>
 
-    {{ tasks }}
+    <ul>
+        {% for item in tasks %}
+            <li>{{ item.text }}</li>
+        {% endfor %}
+    </ul>
+
 
     
 </body>
