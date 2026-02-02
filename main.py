@@ -25,7 +25,8 @@ class Textify(db.Model):
 @app.route("/")
 def home():
     if "username" in session:
-        return render_template("home.html", username=session['username'])
+        tasks = Textify.query.all()
+        return render_template("home.html", username=session['username'], tasks=tasks)
     return render_template("welcoming.html")
     
 #Login
