@@ -1,51 +1,50 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Email
-from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-
-
-
-
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired
 
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///demoAppDb.db' # sqlite database
-app.config['SECRET_KEY'] = 'your_secret_key' #nøkel
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///demoAppDb.db'
+app.config['SECRET_KEY'] = 'your_secret_key'
 db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)
-login_manager = LoginManager(app)
-login_manager.login_view = 'login' #to the login route if not logged in
 
 
 class Textify(db.Model):
     id=db.Column(db.Integer,unique=True,primary_key=True)
     text=db.Column(db.String(25),nullable=False)
-    username=db.Column(db.String(25),unique=True,nullable=False)
 
-
-class Registartionform(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+class Registartionform(FlaskForm):   
     text = StringField('text', validators=[DataRequired()])
-    submit = SubmitField('Sign Up')
-
+    submit = SubmitField('Sign Up') 
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    items = Textify.query.all()
+    return render_template('home.html', items=items)       #sender items to home.html template
 
+@app.route('/create', methods=['GET', 'POST'])
+def create():
+    if request.method == 'GET':
+        return render_template('create.html')
+    text=request.form['text']
+    new_item = Textify(text=text)
+    db.session.add(new_item)
+    db.session.commit()
+    return redirect(url_for('home'))
 
-@app.route('/create-account', methods=['GET', 'POST'])
-def create_account():
-    apti="hyftytfty"
-    jdh = Textify(text=apti)
-    db.add(jdh)
-    db.commit()
-    
+@app.route('/update/')
 
+@app.route('/delete/<int:id>', methods=['POST'])
+def delete(id):
+    item = Textify.query.get_or_404(id)
+    db.session.delete(item)
+    db.session.commit()
+    flash('Item deleted successfully!', 'success')
+    return redirect(url_for('home'))
 
 if __name__ == '__main__':
+    db.create_all()
     app.run(debug=True)
