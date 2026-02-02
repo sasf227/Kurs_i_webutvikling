@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 
-
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
 
@@ -18,7 +17,9 @@ class User(db.Model):
     username = db.Column(db.String(25), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
 
-
+class Textify(db.Model):
+    id=db.Column(db.Integer,unique=True,primary_key=True)
+    text=db.Column(db.String(25),nullable=False)
 
 #Routes
 @app.route("/")
