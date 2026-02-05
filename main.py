@@ -98,6 +98,18 @@ def create():
     return redirect(url_for('home'))
 
 
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+def update(id):
+    item = Textify.query.get_or_404(id)
+    
+    if request.method == 'POST': 
+        item.text = request.form['text']
+        db.session.commit() 
+        return redirect(url_for('home'))
+    
+    return render_template('update.html', item=item)
+
+
 # Slett oppgave
 @app.route('/delete/<int:id>', methods=['POST'])
 def delete(id):
@@ -105,6 +117,7 @@ def delete(id):
     item = Textify.query.get_or_404(id)
     db.session.delete(item)
     db.session.commit()
+
     return redirect(url_for('home'))
     
     
